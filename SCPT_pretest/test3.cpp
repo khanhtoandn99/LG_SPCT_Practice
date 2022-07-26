@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <string>
+#include <cstring>
 #include <stdlib.h>
 #include <stdio.h>
 #include "math.h"
@@ -12,8 +12,11 @@ int B;//number system
 char S[110];//first integer
 char D[110];//second integer
 
-int iUnsignedSLen;
-int iUnsignedDLen;
+// Input properties:
+int iSArr[110];
+int iDArr[110];
+int iSLen;
+int iDLen;
 bool bSNegative;
 bool bDNegative;
 
@@ -22,91 +25,67 @@ void InputData()
 	cin >> B >> S >> D;
 }
 
-void convertSD2Decimal()
+void ParseInput()
 {
-    if (B != 10)
-    {
-        int iS = 0;
-        int iSLen = strlen(S);
-        for (int i = 0; i < iSLen; ++i) {
-            char x = S[iSLen - 1 - i];
-            if ('0' <= x && x <= '9') {
-                iS += (x - 48)*pow(B, i);
-            } else {
-                iS += (x - 65 + 10)*pow(B, i);
-            }
-        }
-        memset(&S, 0x0, sizeof(S));
-        sprintf(S, "%d", iS);
-        // cout << S << endl;
+    iSLen = strlen(S);
+    iDLen = strlen(D);
+    bSNegative = false;
+    bDNegative = false;
 
-        int iD = 0;
-        int iDLen = strlen(D);
-        for (int i = 0; i < iDLen; ++i) {
-            char x = D[iDLen - 1 - i];
-            if ('0' <= x && x <= '9') {
-                iD += (x - 48)*pow(B, i);
-            } else {
-                iD += (x - 65 + 10)*pow(B, i);
-            }
-        }
-        memset(&D, 0x0, sizeof(D));
-        sprintf(D, "%d", iD);
-        // cout << D << endl;
-
-        bSNegative = false;
-        bDNegative = false;
-        return;
-    }
-
-    if (S[0] == '-') {
+    if (B == 10 && S[0] == '-') {
         bSNegative = true;
-        iUnsignedSLen = strlen(S) - 1;
-        for (int i = 0; i < iUnsignedSLen; ++i) {
-            S[i] = S[i + 1];
-        }
-        S[iUnsignedSLen] = 0;
-    } else {
-        bSNegative = false;
-        iUnsignedSLen = strlen(S);
+        iSLen -= 1;
     }
-
-    if (D[0] == '-') {
+    if (B == 10 && D[0] == '-') {
         bDNegative = true;
-        iUnsignedDLen = strlen(D) - 1;
-        for (int i = 0; i < iUnsignedDLen; ++i) {
-            D[i] = D[i + 1];
-        }
-        D[iUnsignedDLen] = 0;
-    } else {
-        bDNegative = false;
-        iUnsignedDLen = strlen(D);
+        iDLen -= 1;
+    }
+    for (int i = 0; i < iSLen; ++i) {
+        iSArr[i] = ('0' <= S[i + bSNegative] && S[i + bSNegative] <= '9') ? (int)(S[i + bSNegative] - 48) : (int)(S[i + bSNegative] - 65 + 10);
+        // cout << (int)iSArr[i];
+    }
+    // cout << endl;
+    for (int i = 0; i < iDLen; ++i) {
+        iDArr[i] = ('0' <= D[i + bDNegative] && D[i + bDNegative] <= '9') ? (int)(D[i + bDNegative] - 48) : (int)(D[i + bDNegative] - 65 + 10);
+        // cout << (int)iDArr[i];
     }
 }
 
 void calculating()
 {
-    vector<int> vResultList[iUnsignedDLen];
-    int iDLastIdx = iUnsignedDLen - 1;
-    int iSLastIdx = iUnsignedSLen - 1;
+    // cout << endl;
+    vector<int> vResultList[iDLen];
+    int iDLastIdx = iDLen - 1;
+    int iSLastIdx = iSLen - 1;
     for (int i = iDLastIdx; i >= 0; --i) {
-        vResultList[iDLastIdx - i].resize(iUnsignedSLen + iUnsignedDLen - 1, 0);
+        vResultList[iDLastIdx - i].resize(iSLen + iDLen - 1, 0);
         for (int j = iSLastIdx; j >= 0; --j) {
-            vResultList[iDLastIdx - i][iSLastIdx - j + iDLastIdx - i] = (int)((D[i] - 48)*(S[j] - 48));
+            vResultList[iDLastIdx - i][iSLastIdx - j + iDLastIdx - i] = iDArr[i]*iSArr[j];
         }
     }
 
-    vector<int> result;
+    // // Debug result
+    // for (int i = 0; i < iDLen; ++i) {
+    //     for (int j = 0; j < vResultList[i].size(); ++j) {
+    //         cout << vResultList[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
+
+    vector<char> result;
     int iRem = 0;
-    for (int i = 0; i < iUnsignedSLen + iUnsignedDLen - 1; ++i) {
+    for (int i = 0; i < iSLen + iDLen - 1; ++i) {
         int iRes = 0;
-        for (int j = 0; j < iUnsignedDLen; ++j) {
+        for (int j = 0; j < iDLen; ++j) {
             iRes += vResultList[j].at(i);
         }
-        result.push_back( (iRes + iRem) - ((int)(iRes + iRem)/10)*10 );
-        iRem = (int)((iRes + iRem)/10);
+        int iRedundant = (iRes + iRem) - (int)((iRes + iRem)/B)*B;
+        if (iRedundant > 9) result.push_back((char)(iRedundant + 65 - 10));
+        else result.push_back((char)(iRedundant + 48));
+        // cout << iRedundant << " ";
+        iRem = (int)((iRes + iRem)/B);
     }
-    if (iRem != 0) result.push_back(iRem);
+    if (iRem != 0) result.push_back((char)(iRem + 48));
 
     // output
     if (bSNegative ^ bDNegative) cout << "-";
@@ -121,7 +100,7 @@ int main(){
 	for(i = 0; i < N; i++) {
 		InputData();//input function
 		//	write the code
-        convertSD2Decimal();
+        ParseInput();
         calculating();
 
 	}
