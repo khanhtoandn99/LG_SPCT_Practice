@@ -29,56 +29,43 @@ void Solve()
         return;
     }
 
-    bool bSNegative = false;
-    bool bDNegative = false;
-    int iSLen = strlen(S);
-    int iDLen = strlen(D);
+    char *pS = S, *pD = D;
+    if (S[0] == '-') pS++;
+    if (D[0] == '-') pD++;
+    int iSLen = strlen(pS), iDLen = strlen(pD);
 
-    if (B == 10 && S[0] == '-') {
-        bSNegative = true;
-        iSLen -= 1;
-        for (int i = 0; i < iSLen; ++i) {
-            S[i] = S[i + 1];
-        }
-        S[iSLen] = 0;
-    }
+    int iRes[iDLen][iDLen + iSLen - 1];
+    memset(iRes, 0x0, sizeof(iRes));
 
-    if (B == 10 && D[0] == '-') {
-        bDNegative = true;
-        iDLen -= 1;
-        for (int i = 0; i < iDLen; ++i) {
-            D[i] = D[i + 1];
-        }
-        D[iDLen] = 0;
-    }
-
-    int vResLen = iSLen + iDLen - 1;
-    int vRes[iDLen][vResLen];
-    memset(vRes, 0x0, sizeof(vRes));
-
-    for (int i = iDLen - 1; i >= 0; --i) {
-        for (int j = iSLen - 1; j >= 0; --j) {
-            vRes[i][iSLen - 1 - j + (iDLen - 1 - i)] = chtoi(D[i])*chtoi(S[j]);
+    for (int d = iDLen - 1; d >= 0; --d) {
+        for (int s = iSLen - 1; s >= 0; --s) {
+            iRes[iDLen - 1 - d][iSLen - 1 - s + (iDLen - 1 - d)] = chtoi(pD[d])*chtoi(pS[s]);
         }
     }
 
-    int iResLen = iSLen + iDLen;
-    char res[iResLen]{0};
+    char result[220] = {0};
     int iRem = 0;
-    for (int i = 0; i < vResLen; ++i) {
+    for (int i = 0; i < iDLen + iSLen - 1; ++i) {
         int iSum = 0;
-        for (int j = 0; j < iDLen; ++j) {
-            iSum += vRes[j][i];
+        for (int d = 0; d < iDLen; ++d) {
+            iSum += iRes[d][i];
         }
-        res[i] = itoch((iSum + iRem)%B);
-        iRem = (int)(iSum + iRem)/B;
-        // cout << res[i] << " " << iRem << " -- ";
+        iSum += iRem;
+        result[i] = itoch((int)(iSum%B));
+        iRem = (int)(iSum/B);
     }
-    if (iRem > 0) res[iResLen - 1] = itoch(iRem);
 
-    if (bSNegative ^ bDNegative) cout << "-";
-    for (int i = strlen(res) - 1; i >= 0; --i)
-        cout << res[i];
+    // Xu ly phan du con lai:
+    for (int i = iDLen + iSLen - 1; iRem%B > 0; ++i) {
+        result[i] = itoch((int)(iRem%B));
+        iRem = iRem/B;
+    }
+
+    // In ket qua
+    if ((S[0] == '-') ^ (D[0] == '-')) cout << "-";
+    for (int i = strlen(result) - 1; i >= 0; --i) {
+        cout << (char)result[i];
+    }
     cout << endl;
 }
 
