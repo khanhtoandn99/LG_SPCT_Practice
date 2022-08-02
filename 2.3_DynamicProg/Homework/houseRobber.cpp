@@ -27,15 +27,44 @@ Constraints:
  */
 
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
+int N;
+int mem[100];
+
+int rob(vector<int>& nums);
+int max(int a, int b);
+
+int max(int a, int b)
+{
+    return a > b ? a : b;
+}
+
+int solve(vector<int>& nums, int i)
+{
+    if (i < 0) return 0;
+    if (mem[i] != -1) return mem[i];
+    mem[i] = max(solve(nums, i - 1), solve(nums, i - 2) + nums.at(i));
+    return mem[i];
+}
+
 int rob(vector<int>& nums)
 {
-    
+    return solve(nums, N - 1);
 }
 
 int main()
 {
-    cout << rob
+    vector<int> vNums;
+    cin >> N;
+    for (int i = 0; i < N; ++i) {
+        mem[i] = -1;
+        int x;
+        cin >> x;
+        vNums.push_back(x);
+    }
+    cout << rob(vNums);
+    cout << endl;
 }
