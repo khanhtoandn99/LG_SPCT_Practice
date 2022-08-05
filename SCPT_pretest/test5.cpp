@@ -51,20 +51,11 @@ int main(){
 
     cout << "sum = " << sum << endl;
     for (int i = 0; i < iPos; ++i) {
-        int *pBegin = P, *pEnd = P;
+        int *pBegin = P, iLen = 0;
         pBegin = pBegin + posIdx[i] + 1;
-        if (posIdx[i+1] == -1) pEnd = pBegin;
-        else pEnd = pEnd + posIdx[i+1] - 1;
-        
-        cout << "pBegin[0] = " << pBegin[0] << endl;
-        cout << "pEnd[0] = " << pEnd[0] << endl;
+        if (posIdx[i+1] != -1) iLen = posIdx[i+1] - posIdx[i];
 
-        std::sort(pBegin, pEnd, myfunction);
-
-        for (int j = 0; j < posIdx[i+1] - posIdx[i] - 1; ++j)
-            cout << pBegin[j] << " < ";
-        cout << endl;
-        cout << "sum -= " << pBegin[0] << endl;
+        std::sort(pBegin, pBegin + iLen);
 
         if (posIdx[i+1] == -1) sum -= 0;
         else sum -= pBegin[0];
