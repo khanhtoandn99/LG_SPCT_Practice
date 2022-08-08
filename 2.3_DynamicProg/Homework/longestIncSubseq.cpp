@@ -7,51 +7,31 @@ using namespace std;
 
 class Solution {
 public:
-    int maxLen = 1, iLen = 1;
-
     int lengthOfLIS(vector<int>& nums) {
-        for (int i = 0; i < nums.size(); ++i) {
-            iLen = 1;
-            dp(nums, i);
-            cout << "maxLen = " << maxLen << endl;
-        }
-        return maxLen;
-    }
+        vector<int> L(nums.size(), 1);
+        for (int i = 0; i < nums.size(); ++i) L[i] = 1;
 
-     // 0 1 2 
-    // [3,1,2]
-    int dp(vector<int>& nums, int pos) {
-        if (pos >= nums.size() - 1) {
-
-        }
-        // 0 1 2 3 4 5
-        // 0,1,0,3,2,3
-        for (int i = pos + 1; i < nums.size(); ++i) {
-            if (nums[pos] < nums[i]) {
-                ++iLen;
-                if (iLen >= maxLen) maxLen = iLen;
-                dp(nums, i);
+        for (int i = 1; i < nums.size(); ++i) {
+            for (int j = 0; j < i; ++j) {
+                if (nums[i] > nums[j]) {
+                    L[i] = max(L[i], L[j] + 1);
+                }
             }
         }
-
-        return 0;
+        sort(L.begin(), L.begin() + nums.size());
+        return L.at(L.size() - 1);
     }
 };
 
-// [0,1,0,3,2,3]
-// [7,7,7,7,7,7]
-// [10,9,2,5,3,7,101,18]
 int main()
 {
     vector<int> nums;
-    int N = 8;
-    int a[N] = {10,9,2,5,3,7,101,18};
+    int a[6] = {0,1,0,3,2,3};
 
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < 6; ++i) {
         nums.push_back(a[i]);
     }
 
-    cout << "----------------------" << endl;
     Solution sol;
     cout << sol.lengthOfLIS(nums) << endl;
 }
