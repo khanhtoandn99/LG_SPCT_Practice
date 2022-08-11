@@ -1,4 +1,7 @@
 #include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
 using namespace std;
 
 int N;
@@ -12,81 +15,60 @@ void input()
     }
 }
 
-enum DIRECTION
+struct COLOR_INFO_T
 {
-    TOP = 0,
-    RIGHT = 3,
-    BOTTOM = 6,
-    LEFT = 9
+    int srow = 11; // start row
+    int scol = 11; // start col
+    int erow = -1; // end row
+    int ecol = -1; // end col
+
+    bool in_used = false; // there are 9 colors, set to true if the color is used in paper
+    bool paintOver = false; // set to true if determined that this color is painted over other color
 };
 
-char getColor(DIRECTION dir, int row, int col)
+int main()
 {
-    switch (dir)
-    {
-    case TOP:
-        if (row - 1 >= 0) return paper[row-1][col];
-        return '-';
-    case RIGHT:
-        if (col + 1 < N) return paper[row][col+1];
-        return '-';
-    case BOTTOM:
-        if (row + 1 < N) return paper[row+1][col];
-        return '-';
-    case LEFT:
-        if (col - 1 >= 0) return paper[row][col-1];
-        return '-';
-    }
-    return '-';
-}
-
-int main() {
     input();
-    // // debug
-    // for (int i = 0; i < N; ++i) {
-    //     cout << paper[i] << endl;
-    // }
 
     // Write code here:
-    int bOver[10] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+    // scan and save all color information
+    COLOR_INFO_T info[10] ;
     for (int ir = 0; ir < N; ++ir) {
         for (int ic = 0; ic < N; ++ic) {
-            if (paper[ir][ic] == '0' || bOver[paper[ir][ic] - '0'] == 1) continue;
-            // Review 4 color around:
-            if (bOver[paper[ir][ic] - '0'] == -1) bOver[paper[ir][ic] - '0'] = 0;
-            bool bSameColor = false; // At least one same its color?
-            bool bDiffAdjacent = false; // Two same color, but diff its color, and adjacent?
+            int iColor = (int)(paper[ir][ic] - '0');
+            if (iColor == 0) continue;
 
-            char top = getColor(TOP, ir, ic); //cout << "top: " << top << endl;
-            if (top == paper[ir][ic]) bSameColor = true;
-            else {
-                if (top != '-' && top != '0' && top == getColor(RIGHT,ir,ic)) bDiffAdjacent = true;
-            }
-
-            char right = getColor(RIGHT, ir, ic); //cout << "right: " << right << endl;
-            if (right == paper[ir][ic]) bSameColor = true;
-            else {
-                if (right != '-' && right != '0' && right == getColor(BOTTOM,ir,ic)) bDiffAdjacent = true;
-            }
-
-            char bottom = getColor(BOTTOM, ir, ic); //cout << "bottom: " << bottom << endl;
-            if (bottom == paper[ir][ic]) bSameColor = true;
-            else {
-                if (bottom != '-' && bottom != '0' && bottom == getColor(LEFT,ir,ic)) bDiffAdjacent = true;
-            }
-
-            char left = getColor(LEFT, ir, ic); //cout << "left: " << left << endl;
-            if (left == paper[ir][ic]) bSameColor = true;
-            else {
-                if (left != '-' && left != '0' && left == getColor(TOP,ir,ic)) bDiffAdjacent = true;
-            }
-
-            if (bSameColor == true && bDiffAdjacent == true) bOver[paper[ir][ic] - '0'] = 1;
+            info[iColor].in_used = true;
+            info[iColor].srow = min(info[iColor].srow, ir);
+            info[iColor].scol = min(info[iColor].scol, ic);
+            info[iColor].erow = max(info[iColor].erow, ir);
+            info[iColor].ecol = max(info[iColor].ecol, ic);
         }
     }
-    int noNotOver = 0;
-    for (int i = 1; i < N; ++i) {
-        if (bOver[i] == 0) noNotOver++;
+
+    // Now scan and determined if the color in used is painted over other color for each position.
+    // The color that set as paintOver == true or in_used == false will be skip.
+    for (int ir = 0; ir < N; ++ir) {
+        for (int ic = 0; ic < N; ++ic) {
+            int iColorInCheck = (int)(paper[ir][ic] - '0');
+            if (iColorInCheck == 0) continue;
+            for (int iColor = 1; iColor < 10; ++iColor) {
+                if (iColorInCheck == iColor || info[iColorInCheck].paintOver == true) continue;
+                if (info[iColor].srow <= ir && ir <= info[iColor].erow &&
+                    info[iColor].scol <= ic && ic <= info[iColor].ecol) {
+                        info[iColorInCheck].paintOver = true;
+                        break;
+                }
+            }
+        }
     }
-    cout << noNotOver << endl;
+    // Counting
+    int ans = 0;
+    for (int iColor = 0; iColor < 10; ++iColor) {
+        if (info[iColor].in_used == true && info[iColor].paintOver == false)
+            ++ans;
+    }
+
+    // Output here:
+    cout << ans << endl;
 }
