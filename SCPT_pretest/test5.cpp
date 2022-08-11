@@ -46,4 +46,4 @@ int main() {
     ans = iSum + P[N-1];
     cout << ans << endl;	//	Output answer
     return 0;
-    }
+}
