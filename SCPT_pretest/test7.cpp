@@ -2,8 +2,7 @@
 using namespace std;
 
 int N;//The number of candidates
-// int A[100000 + 10] = {-10,-6,-5,2,7,14,21,30};//Temperament value
-int A[100000 + 10] = {-6,-3,-1,0,1,2,4,5};//Temperament value
+int A[100000 + 10];//Temperament value
 
 void InputData()
 {
@@ -15,10 +14,11 @@ int main(){
     InputData();//	Input function
 
     //	Create the code
-    int r = N-1, minR = N-1;
-    int l = 0, minL;
-    int closest = 1000000000;
-    for (l = 0; l < r; ++l) {
+    if (A[0] >= 0) cout << A[0] << " " << A[1] << endl;
+    int minR = N-1, r = N-1;
+    int minL = 0, l = 1;
+    int closest = abs(A[minL] + A[minR]);
+    for (l = 1; l < r; ++l) {
         while (r > l) {
             // cout << "l: " << l << " r: " << r << endl;
             int absDiff = abs(A[l] + A[r]);
@@ -27,10 +27,9 @@ int main(){
                 if (r < minR) minR = r;
                 minL = l;
             }
-            if (abs(A[r]) < abs(A[l]) && absDiff >= closest) break;
+            if (A[r] < abs(A[l])) break;
             --r;
         }
-        r = minR;
     }
     cout << minL << " " << minR << endl;
     return 0;
