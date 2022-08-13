@@ -1,10 +1,9 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
 using namespace std;
 
 int N;//The number of candidates
-int A[100000 + 10];//Temperament value
+// int A[100000 + 10] = {-10,-6,-5,2,7,14,21,30};//Temperament value
+int A[100000 + 10] = {-6,-3,-1,0,1,2,4,5};//Temperament value
 
 void InputData()
 {
@@ -12,28 +11,27 @@ void InputData()
     for (int i = 0; i < N; i++) cin >> A[i];
 }
 
-int main()
-{
+int main(){
     InputData();//	Input function
 
     //	Create the code
-    vector<int> iIntro;
-    vector<int> iExtro;
-    for (int i = 0; i < N; i++) {
-        if (A[i] < 0) iIntro.push_back(A[i]);
-        else iExtro.push_back(A[i]);
+    int r = N-1, minR = N-1;
+    int l = 0, minL;
+    int closest = 1000000000;
+    for (l = 0; l < r; ++l) {
+        while (r > l) {
+            // cout << "l: " << l << " r: " << r << endl;
+            int absDiff = abs(A[l] + A[r]);
+            if (absDiff < closest) {
+                closest = absDiff;
+                if (r < minR) minR = r;
+                minL = l;
+            }
+            if (abs(A[r]) < abs(A[l]) && absDiff >= closest) break;
+            --r;
+        }
+        r = minR;
     }
-
-    sort(iIntro.begin(), iIntro.end());
-    sort(iExtro.begin(), iExtro.end());
-
-    int iLen = (iIntro.size() < iExtro.size()) ? iIntro.size() : iExtro.size();
-    int iCmp[iLen] = {0};
-    for (int i = 0; i < iLen; ++i) {
-        iCmp[i] = iIntro[i] + iExtro[i];
-    }
-
-    sort(iCmp, iCmp + iLen);
-
+    cout << minL << " " << minR << endl;
     return 0;
 }
