@@ -10,12 +10,6 @@ char map[110][110];//Map information
 bool marked[110][110] = {{false},{false}}; // Marked infomation
 int  roadmap[110][110] = {{INF},{INF}};
 
-typedef struct
-{
-    int row;
-    int col;
-} POINT_T;
-
 void Input_Data()
 {
     cin >> N;
@@ -25,35 +19,68 @@ void Input_Data()
 }
 
 
-void dijkstra(int sr, int sc)
+int dijkstra(int start_row, int start_col)
 {
-    roadmap[0][0] = 0;
-    int mapchecked = 3;
-    int ur = sr, uc = sc;
+    int cur_row = start_row, cur_col = start_col;
+    int up_row, up_col, right_row, right_col, down_row, down_col, left_row, left_col;
+    int mapCheckedNum = N*N;
 
-    while (mapchecked > 0)
+    while (mapCheckedNum > 0)
     {
-        int uMin = INF, up, right, down, left; // check value of its around roads and find min
-        int nr, nc; // next row,col
+        int min_val = INF, min_row, min_col;
+        // cout << "[" << cur_row << "," << cur_col << "] = " << (int)(map[cur_row][cur_col] - '0') << endl;
+        up_row    = cur_row - 1; up_col    = cur_col;
+        right_row = cur_row;     right_col = cur_col + 1;
+        down_row  = cur_row + 1; down_col  = cur_col;
+        left_row  = cur_row;     left_col  = cur_col - 1;
 
-        up = (ur > 0 && marked[ur-1][uc] == false) ? (int)(map[ur-1][uc] - '0') : INF;
-        if (min(up, uMin) == up) {nr = ur-1; nc = uc; uMin = up;}
+        if (up_row >= 0) { // UP nearby
+            roadmap[up_row][up_col] = min(roadmap[up_row][up_col], roadmap[cur_row][cur_col] + (int)(map[up_row][up_col] - '0'));
+            if (marked[up_row][up_col] == false && min(roadmap[up_row][up_col], min_val) == roadmap[up_row][up_col]) {
+                min_row = up_row;
+                min_col = up_col;
+                min_val = roadmap[up_row][up_col];
+            }
+        }
 
-        right = (uc < N-1 && marked[ur][uc+1] == false) ? (int)(map[ur][uc+1] - '0') : INF;
-        if (min(right, uMin) == right) {nr = ur; nc = uc+1; uMin = right;}
+        if (right_col < N) { // UP nearby
+            roadmap[right_row][right_col] = min(roadmap[right_row][right_col], roadmap[cur_row][cur_col] + (int)(map[right_row][right_col] - '0'));
+            if (marked[right_row][right_col] == false && min(roadmap[right_row][right_col], min_val) == roadmap[right_row][right_col]) {
+                min_row = right_row;
+                min_col = right_col;
+                min_val = roadmap[right_row][right_col];
+            }
+        }
 
-        down = (ur < N-1 && marked[ur+1][uc] == false) ? (int)(map[ur+1][uc] - '0') : INF;
-        if (min(down, uMin) == down) {nr = ur+1; nc = uc; uMin = down;}
+        if (down_row < N) { // UP nearby
+            roadmap[down_row][down_col] = min(roadmap[down_row][down_col], roadmap[cur_row][cur_col] + (int)(map[down_row][down_col] - '0'));
+            if (marked[down_row][down_col] == false && min(roadmap[down_row][down_col], min_val) == roadmap[down_row][down_col]) {
+                min_row = down_row;
+                min_col = down_col;
+                min_val = roadmap[down_row][down_col];
+            }
+        }
 
-        left = (uc > 0 && marked[ur][uc-1] == false) ? (int)(map[ur][uc-1] - '0') : INF;
-        if (min(left, uMin) == left) {nr = ur; nc = uc-1; uMin = left;}
+        if (left_col >= 0) { // UP nearby
+            roadmap[left_row][left_col] = min(roadmap[left_row][left_col], roadmap[cur_row][cur_col] + (int)(map[left_row][left_col] - '0'));
+            if (marked[left_row][left_col] == false && min(roadmap[left_row][left_col], min_val) == roadmap[left_row][left_col]) {
+                min_row = left_row;
+                min_col = left_col;
+                min_val = roadmap[left_row][left_col];
+            }
+        }
+        marked[cur_row][cur_col] = true;
+        cur_row = min_row; cur_col = min_col;
 
-        marked[ur][uc] = true;
-        cout << map[nr][nc] << endl;
-        ur = nr; uc = nc;
-
-        mapchecked -= 1;
+        mapCheckedNum -= 1;
     }
+    // Debug:
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            cout << roadmap[i][j] << " ";
+        }
+    }
+    return roadmap[N-1][N-1];
 }
 
 int main()
@@ -62,8 +89,21 @@ int main()
     Input_Data();		//	Input function
 
     //  Write the code
-    dijkstra(0, 0);
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            roadmap[i][j] = INF;
+        }
+    }
+    roadmap[0][0] = 0;
 
-    // cout << ans << endl;	//	Output answer
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            marked[i][j] = false;
+        }
+    }
+
+    ans = dijkstra(0, 0);
+
+    cout << ans << endl;	//	Output answer
     return 0;
 }
