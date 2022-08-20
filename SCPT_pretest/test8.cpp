@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <climits>
 using namespace std;
 
 #define INF 1000000000
@@ -7,8 +8,11 @@ using namespace std;
 int N;//Map Size
 char map[110][110];//Map information
 
-bool marked[110][110] = {{false},{false}}; // Marked infomation
-int  roadmap[110][110] = {{INF},{INF}};
+bool marked[110][110];// Marked infomation
+int  roadmap[110][110];
+const int r[4] = {-1, 0, 1, 0}; // UP - RIGHT - DOWN - LEFT
+const int c[4] = {0, 1, 0, -1}; // UP - RIGHT - DOWN - LEFT
+
 
 void Input_Data()
 {
@@ -19,66 +23,46 @@ void Input_Data()
 }
 
 
-int dijkstra(int start_row, int start_col)
+int dijkstra(int srow, int scol)
 {
-    int cur_row = start_row, cur_col = start_col;
-    int up_row, up_col, right_row, right_col, down_row, down_col, left_row, left_col;
-    int mapCheckedNum = N*N;
-
-    while (mapCheckedNum > 0)
+    int numMarked = N*N;
+    int row = srow, col = scol;
+    // int nextRow, nextCol;
+    while (numMarked > 0)
     {
-        int min_val = INF, min_row, min_col;
-        // cout << "[" << cur_row << "," << cur_col << "] = " << (int)(map[cur_row][cur_col] - '0') << endl;
-        up_row    = cur_row - 1; up_col    = cur_col;
-        right_row = cur_row;     right_col = cur_col + 1;
-        down_row  = cur_row + 1; down_col  = cur_col;
-        left_row  = cur_row;     left_col  = cur_col - 1;
+        int minPoint = INT_MAX;
+        int nextRow = -1, nextCol = -1;
+        marked[row][col] = true;
+        for (int i = 0; i < 4; ++i)
+        {
+            int nbrRow = row + r[i]; // Neighbor row
+            int nbrCol = col + c[i]; // Neighbor col
+            if (nbrRow < 0 || nbrRow > N-1) continue;
+            if (nbrCol < 0 || nbrCol > N-1) continue;
+            // Update roadmap:
+            roadmap[nbrRow][nbrCol] = min(roadmap[nbrRow][nbrCol], roadmap[row][col] + (int)(map[nbrRow][nbrCol] - '0'));
+            // #1. Find next minimum & unmarked point - Method 1:
+            // if (roadmap[nbrRow][nbrCol] < minPoint && marked[nbrRow][nbrCol] == false) {
+            //     minPoint = roadmap[nbrRow][nbrCol];
+            //     nextRow = nbrRow;
+            //     nextCol = nbrCol;
+            // }
 
-        if (up_row >= 0) { // UP nearby
-            roadmap[up_row][up_col] = min(roadmap[up_row][up_col], roadmap[cur_row][cur_col] + (int)(map[up_row][up_col] - '0'));
-            if (marked[up_row][up_col] == false && min(roadmap[up_row][up_col], min_val) == roadmap[up_row][up_col]) {
-                min_row = up_row;
-                min_col = up_col;
-                min_val = roadmap[up_row][up_col];
+            // #2. Find next minimum & unmarked point - Method 2: --> Need discussion why need to scan full map instead of #1
+            for (int ri = 0; ri < N; ++ri) {
+                for (int ci = 0; ci < N; ++ci) {
+                    if (roadmap[ri][ci] < minPoint && marked[ri][ci] == false) {
+                        minPoint = roadmap[ri][ci];
+                        nextRow = ri;
+                        nextCol = ci;
+                    }
+                }
             }
+            if (nextRow == -1 || nextCol == -1) return roadmap[N-1][N-1]; // if do not find any point ==> return;
         }
-
-        if (right_col < N) { // UP nearby
-            roadmap[right_row][right_col] = min(roadmap[right_row][right_col], roadmap[cur_row][cur_col] + (int)(map[right_row][right_col] - '0'));
-            if (marked[right_row][right_col] == false && min(roadmap[right_row][right_col], min_val) == roadmap[right_row][right_col]) {
-                min_row = right_row;
-                min_col = right_col;
-                min_val = roadmap[right_row][right_col];
-            }
-        }
-
-        if (down_row < N) { // UP nearby
-            roadmap[down_row][down_col] = min(roadmap[down_row][down_col], roadmap[cur_row][cur_col] + (int)(map[down_row][down_col] - '0'));
-            if (marked[down_row][down_col] == false && min(roadmap[down_row][down_col], min_val) == roadmap[down_row][down_col]) {
-                min_row = down_row;
-                min_col = down_col;
-                min_val = roadmap[down_row][down_col];
-            }
-        }
-
-        if (left_col >= 0) { // UP nearby
-            roadmap[left_row][left_col] = min(roadmap[left_row][left_col], roadmap[cur_row][cur_col] + (int)(map[left_row][left_col] - '0'));
-            if (marked[left_row][left_col] == false && min(roadmap[left_row][left_col], min_val) == roadmap[left_row][left_col]) {
-                min_row = left_row;
-                min_col = left_col;
-                min_val = roadmap[left_row][left_col];
-            }
-        }
-        marked[cur_row][cur_col] = true;
-        cur_row = min_row; cur_col = min_col;
-
-        mapCheckedNum -= 1;
-    }
-    // Debug:
-    for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < N; ++j) {
-            cout << roadmap[i][j] << " ";
-        }
+        row = nextRow;
+        col = nextCol;
+        --numMarked;
     }
     return roadmap[N-1][N-1];
 }
@@ -89,20 +73,23 @@ int main()
     Input_Data();		//	Input function
 
     //  Write the code
+    // Init data:
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j < N; ++j) {
-            roadmap[i][j] = INF;
+            roadmap[i][j] = INT_MAX;
+            marked[i][j] = false;
         }
     }
     roadmap[0][0] = 0;
 
-    for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < N; ++j) {
-            marked[i][j] = false;
-        }
-    }
-
     ans = dijkstra(0, 0);
+
+    // // debug:
+    // for (int i = 0; i < N; ++i) {
+    //     for (int j = 0; j < N; ++j)
+    //         cout << roadmap[i][j] << " ";
+    // }
+    // cout << endl;
 
     cout << ans << endl;	//	Output answer
     return 0;
