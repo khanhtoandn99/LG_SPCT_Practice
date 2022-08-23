@@ -1,10 +1,17 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 int N;//Number of buildings
 int H[80010];//Height of buildings
 
-int S[80010] = {0}; // nums of rooftops can be seen of each building S[i]
+int S[80010] = {0};
+
+typedef struct
+{
+    int maxAt;
+    int minAt;
+} DECS_T;
 
 void Input_Data(void){
 	cin >> N;
@@ -15,40 +22,35 @@ void Input_Data(void){
 
 int main(){
 	long long ans = 0;
-	Input_Data();//	Input function
+	Input_Data();		//	Input function
 
 	//	Write the code
-    int HMaxIdx = N-1;
-    S[N-1] = 0;
-    S[N-2] = 0;
-    if (H[N-2] >= H[N-1]) {
-        S[N-2] = 1;
-        HMaxIdx = N - 2;
-    }
-    for (int i = N-3; i >= 0; --i)
+    // Idea: divide the array H into decsreasing series DECS_T
+    vector<DECS_T> vDecs;
+    int i = 0;
+    while (i < N-1)
     {
-        int j = i + 1;
-        if (H[i] < H[j]) {
-            S[i] = 0; 
-            continue;
-        }
-        while (H[i] >= H[j] && j < N) {
-            // if (j == HMaxIdx) {
-            //     HMaxIdx = i;
-            //     S[i] = S[j] + 1;
-            //     break;
-            // }
-            ++S[i];
-            ++j;
+        DECS_T tmp;
+        tmp.maxAt = i;
+        while (H[i] > H[i+1] && i < N-1) ++i;
+        tmp.minAt = i;
+        vDecs.push_back(tmp);
+        ++i;
+    }
+
+    int vDecSz = vDecs.size();
+    for (i = 0; i < vDecSz; ++i) {
+        for (int j = vDecs[i].maxAt; j < vDecs[i].minAt + 1; ++j) {
+            S[j] = vDecs[i].minAt - j;
+            for (int k = i + 1; k < vDecSz; ++k) {
+                if (H[j] <= H[vDecs[k].maxAt]) break;
+                S[j] += vDecs[k].minAt - vDecs[k].maxAt + 1;
+            }
         }
     }
-    
-    for (int i = 0; i < N; ++i) {
-        // cout << S[i] << " ";
+	for (i = 0; i < N; ++i) {
         ans += S[i];
     }
-    // cout << endl;
-
 	cout << ans << endl;	//	Output right answer
 	return 0;
 }
