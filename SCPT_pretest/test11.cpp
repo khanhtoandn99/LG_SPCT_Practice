@@ -1,75 +1,68 @@
 #include <iostream>
-#include <algorithm>
+#include <climits>
+#include <vector>
 using namespace std;
 
-int N; // Number of Factory
-int M; // Number of Road
-int D[101][101];
+int N; // Number of factory
+int M; // Number of road
+int D[102][102];
 
-int roadmap[101][101];
-bool marked[101][101];
-int maxFrom[101] = {0};
-
-void input()
+void input ()
 {
     cin >> N >> M;
-    for (int i = 1; i <= N; ++i) {
-        for (int j = 1; j <= N; ++j) {
-            if (i == j) {
-                D[i][j] = 0;
-                roadmap[i][j] = 0;
-            }
-            else {
-                D[i][j] = -1;
-                roadmap[i][j] = INT_MAX;
-            }
-            marked[i][j] = false;
-        }
-    }
-
-    int A, B, Dist;
+    int A, B, Distance;
     for (int i = 0; i < M; ++i) {
-        cin >> A >> B >> Dist;
-        D[A][B] = Dist;
-        D[B][A] = Dist;
+        cin >> A >> B >> Distance;
+        D[A][B] = Distance;
+        D[B][A] = Distance;
     }
 }
 
-void dijkstra(int sfac)
+int dijkstra(int sFac)
 {
-    int curFac = sfac;
+    int Farthest = 0;
+    vector<int> map(N+1,INT_MAX);
+    bool marked[N+1] = {false};
+    map[sFac] = 0;
+    int curFac = sFac;
     while (1)
     {
-        int iDmin = INT_MAX;
-        int nextFac;
+        marked[curFac] = true;
         for (int i = 1; i <= N; ++i) {
-            if (D[curFac][i] == 0 || D[curFac][i] == -1) continue;
-            roadmap[curFac][i] = min(roadmap[curFac][i], D[curFac][i]);
-        }
-        for (int j = 0; j <= N; ++j) {
-            if (min(iDmin, roadmap[curFac][j]) == roadmap[curFac][j]) {
-                iDmin = roadmap[curFac][j];
-                nextFac = j;
+            if (D[curFac][i] != 0 && D[curFac][i] != -1) {
+                map[i] = min(map[i], map[curFac] + D[curFac][i]);
             }
         }
-        marked[]
+        int FacMin = INT_MAX;
+        int nextFac = -1;
+        for (int i = 1; i <= N; ++i) {
+            if (min(FacMin, map[i]) == map[i] && marked[i] == false) {
+                nextFac = i;
+                FacMin = map[i];
+            }
+        }
+        if (nextFac == -1) break;
         curFac = nextFac;
     }
+    for (int i = 1; i <= N; ++i) {
+        Farthest = max(Farthest, map[i]);
+    }
+    return Farthest;
 }
 
 int main()
 {
+    for (int i = 0; i < 102; ++i)
+        for (int j = 0; j < 102; ++j)
+            if (i == j) D[i][j] = 0;
+            else D[i][j] = -1;
+
     input();
+    int Farthest[N+1] = {0};
+    int minFarthest = INT_MAX;
     for (int i = 1; i <= N; ++i) {
-        dijkstra(i);
+        Farthest[i] = dijkstra(i);
+        minFarthest = min(minFarthest, Farthest[i]);
     }
-    int ans = INT_MAX;
-    for (int i = 1; i <= N; ++i) {
-        ans = min(ans, maxFrom[i]);
-    }
-    cout << ans << endl;
+    cout << minFarthest << endl;
 }
-
-
-
-
