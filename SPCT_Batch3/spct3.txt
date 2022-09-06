@@ -1,0 +1,368 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <climits>
+
+using namespace std;
+
+#define MAXN (100)
+int N;//Size
+int sol = 0;
+int map[MAXN + 10][MAXN + 10];//Area height information
+
+const int R[8] = {-1,-1,0,1,1,1,0,-1};
+const int C[8] = {0,1,1,1,0,-1,-1,-1};
+
+bool visited[MAXN + 10][MAXN + 10];
+
+int iMinDep = INT_MAX;
+int iMaxDep = 0;
+
+void InputData() {
+	int r, c;
+	cin >> N;
+	for (r = 0; r < N; r++)
+		for (c = 0; c < N; c++)
+		{
+			cin >> map[r][c];
+            visited[r][c] = false;
+            iMinDep = min(iMinDep, map[r][c]);
+            iMaxDep = max(iMaxDep, map[r][c]);
+		}
+}
+
+void BFS(int sr, int sc)
+{
+    queue<int> Q;
+    Q.push(sr); Q.push(sc);
+    // cout << sr << " " << sc << endl;
+    visited[sr][sc] = true;
+    while (Q.size() > 0)
+    {
+        int ur = Q.front(); Q.pop();
+        int uc = Q.front(); Q.pop();
+        for (int i = 0; i < 8; ++i) {
+            int nbr = ur + R[i];
+            int nbc = uc + C[i];
+            if (nbr < 0 || nbr > N -1) continue;
+            if (nbc < 0 || nbc > N -1) continue;
+            if (map[nbr][nbc] != 1 && visited[nbr][nbc] == false) {
+                visited[nbr][nbc] = true;
+                Q.push(nbr); Q.push(nbc);
+                // cout << nbr << " " << nbc;
+            }
+        }
+        // cout << endl;
+    }
+}
+
+int main() {
+
+	InputData();//Input function
+
+	//Write the code
+    int sum = 0;
+        // count
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N; ++j) {
+                if (map[i][j] != 1 && visited[i][j] == false)
+                {
+                    BFS(i,j);
+                    sum += 1;
+                }
+            }
+        } // en cound
+ 
+
+
+
+	//Output
+	cout << sum << endl;
+	return 0;
+}
+
+===========================================================================
+// Only 2/12
+
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <climits>
+
+using namespace std;
+
+#define MAXN (100)
+int N;//Size
+int sol = 0;
+int map[MAXN + 10][MAXN + 10];//Area height information
+
+const int R[8] = {-1,-1,0,1,1,1,0,-1};
+const int C[8] = {0,1,1,1,0,-1,-1,-1};
+
+bool visited[MAXN + 10][MAXN + 10];
+
+int iMinDep = INT_MAX;
+int iMaxDep = 0;
+
+void InputData() {
+	int r, c;
+	cin >> N;
+	for (r = 0; r < N; r++)
+		for (c = 0; c < N; c++)
+		{
+			cin >> map[r][c];
+            visited[r][c] = false;
+            iMinDep = min(iMinDep, map[r][c]);
+            iMaxDep = max(iMaxDep, map[r][c]);
+		}
+}
+
+void BFS(int sr, int sc, int dep)
+{
+    queue<int> Q;
+    Q.push(sr); Q.push(sc);
+    // cout << sr << " " << sc << endl;
+    visited[sr][sc] = true;
+    while (Q.size() > 0)
+    {
+        int ur = Q.front(); Q.pop();
+        int uc = Q.front(); Q.pop();
+        for (int i = 0; i < 8; ++i) {
+            int nbr = ur + R[i];
+            int nbc = uc + C[i];
+            if (nbr < 0 || nbr > N -1) continue;
+            if (nbc < 0 || nbc > N -1) continue;
+            if (map[nbr][nbc] != dep && visited[nbr][nbc] == false) {
+                visited[nbr][nbc] = true;
+                Q.push(nbr); Q.push(nbc);
+                // cout << nbr << " " << nbc;
+            }
+        }
+        // cout << endl;
+    }
+}
+
+int main() {
+
+	InputData();//Input function
+
+	//Write the code
+    int MaxSum = 0;
+    int iDep = iMinDep;
+    while (iDep <= iMaxDep)
+    {
+        // count
+        int sum = 0;
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N; ++j) {
+                if (map[i][j] != iDep && visited[i][j] == false)
+                {
+                    BFS(i,j,iDep);
+                    sum += 1;
+                }
+            }
+        } // en cound
+        MaxSum = max(MaxSum, sum);
+        // reset visited
+        for (int i = 0; i < N; ++i)
+            for (int j = 0; j < N; ++j)
+                visited[i][j] = false;
+        // up Dep to check
+        ++iDep;
+    }
+
+
+
+	//Output
+	cout << MaxSum;
+	return 0;
+}
+
+==========================================
+// 90/100
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <climits>
+
+using namespace std;
+
+#define MAXN (100)
+int N;//Size
+int sol = 0;
+int map[MAXN + 10][MAXN + 10];//Area height information
+
+const int R[8] = {-1,-1,0,1,1,1,0,-1};
+const int C[8] = {0,1,1,1,0,-1,-1,-1};
+
+bool visited[MAXN + 10][MAXN + 10];
+
+int iMinDep = INT_MAX;
+int iMaxDep = 0;
+
+void InputData() {
+	int r, c;
+	cin >> N;
+	for (r = 0; r < N; r++)
+		for (c = 0; c < N; c++)
+		{
+			cin >> map[r][c];
+            visited[r][c] = false;
+            iMinDep = min(iMinDep, map[r][c]);
+            iMaxDep = max(iMaxDep, map[r][c]);
+		}
+}
+
+void BFS(int sr, int sc, int dep)
+{
+    queue<int> Q;
+    Q.push(sr); Q.push(sc);
+    // cout << sr << " " << sc << endl;
+    visited[sr][sc] = true;
+    while (Q.size() > 0)
+    {
+        int ur = Q.front(); Q.pop();
+        int uc = Q.front(); Q.pop();
+        for (int i = 0; i < 8; ++i) {
+            int nbr = ur + R[i];
+            int nbc = uc + C[i];
+            if (nbr < 0 || nbr > N -1) continue;
+            if (nbc < 0 || nbc > N -1) continue;
+            if (map[nbr][nbc] > dep && visited[nbr][nbc] == false) {
+                visited[nbr][nbc] = true;
+                Q.push(nbr); Q.push(nbc);
+                // cout << nbr << " " << nbc;
+            }
+        }
+        // cout << endl;
+    }
+}
+
+int main() {
+
+	InputData();//Input function
+
+	//Write the code
+    int MaxSum = 0;
+    int iDep = iMinDep;
+    while (iDep <= iMaxDep)
+    {
+        // count
+        int sum = 0;
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N; ++j) {
+                if (map[i][j] > iDep && visited[i][j] == false)
+                {
+                    BFS(i,j,iDep);
+                    sum += 1;
+                }
+            }
+        } // en cound
+        MaxSum = max(MaxSum, sum);
+        // reset visited
+        for (int i = 0; i < N; ++i)
+            for (int j = 0; j < N; ++j)
+                visited[i][j] = false;
+        // up Dep to check
+        ++iDep;
+    }
+
+
+
+	//Output
+	cout << MaxSum;
+	return 0;
+}
+
+=================================
+test3 resolved
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <climits>
+
+using namespace std;
+
+#define MAXN (100)
+int N;//Size
+int sol = 0;
+int map[MAXN + 10][MAXN + 10];//Area height information
+
+const int R[8] = {-1,-1,0,1,1,1,0,-1};
+const int C[8] = {0,1,1,1,0,-1,-1,-1};
+
+bool visited[MAXN + 10][MAXN + 10];
+
+int iMinDep = INT_MAX;
+int iMaxDep = 0;
+
+void InputData() {
+	int r, c;
+	cin >> N;
+	for (r = 0; r < N; r++)
+		for (c = 0; c < N; c++)
+		{
+			cin >> map[r][c];
+            visited[r][c] = false;
+            iMinDep = min(iMinDep, map[r][c]);
+            iMaxDep = max(iMaxDep, map[r][c]);
+		}
+}
+
+void BFS(int sr, int sc, int dep)
+{
+    queue<int> Q;
+    Q.push(sr); Q.push(sc);
+    visited[sr][sc] = true;
+    while (Q.size() > 0)
+    {
+        int ur = Q.front(); Q.pop();
+        int uc = Q.front(); Q.pop();
+        for (int i = 0; i < 8; ++i) {
+            int nbr = ur + R[i];
+            int nbc = uc + C[i];
+            if (nbr < 0 || nbr > N -1) continue;
+            if (nbc < 0 || nbc > N -1) continue;
+            if (map[nbr][nbc] > dep && visited[nbr][nbc] == false) {
+                visited[nbr][nbc] = true;
+                Q.push(nbr); Q.push(nbc);
+            }
+        }
+    }
+}
+
+int main() {
+
+	InputData();//Input function
+
+	//Write the code
+    int MaxSum = 1;
+    int iDep = iMinDep;
+    while (iDep <= iMaxDep)
+    {
+        // count
+        int sum = 0;
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N; ++j) {
+                if (map[i][j] > iDep && visited[i][j] == false)
+                {
+                    BFS(i,j,iDep);
+                    sum += 1;
+                }
+            }
+        } // en cound
+        MaxSum = max(MaxSum, sum);
+        // reset visited
+        for (int i = 0; i < N; ++i)
+            for (int j = 0; j < N; ++j)
+                visited[i][j] = false;
+        // up Dep to check
+        ++iDep;
+    }
+
+
+
+	//Output
+	cout << MaxSum;
+	return 0;
+}
