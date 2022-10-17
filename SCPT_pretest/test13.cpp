@@ -17,23 +17,23 @@ int main()
         case 'L': {
             if (cursor == 0) break;
             --cursor;
-            while (cursor - 1 > 0 && S[cursor] == '-') --cursor;
+            while (cursor-1 > 0 && S[cursor-1] == '-') --cursor;
         } break;
         case 'R': {
             if (cursor == S.length()) break;
             ++cursor;
-            while (cursor + 1 < S.length() && S[cursor] == '-') ++cursor;
+            while (cursor < S.length() && S[cursor-1] == '-') ++cursor;
         } break;
         case 'B': {
             if (cursor == 0) break;
             --cursor;
             S[cursor] = '-';
-            while (cursor - 1 > 0 && S[cursor-1] == '-') --cursor;
+            while (cursor-1 > 0 && S[cursor-1] == '-') --cursor;
         } break;
         default: {
             S.insert(S.begin()+cursor, C[Ci]);
             ++cursor;
-            while (cursor + 1 < S.length() && S[cursor] == '-') ++cursor;
+            // while (cursor + 1 < S.length() && S[cursor] == '-') ++cursor;
         } break;
         }
     }
