@@ -41,14 +41,7 @@ int dijkstra(int srow, int scol)
             if (nbrCol < 0 || nbrCol > N-1) continue;
             // Update roadmap:
             roadmap[nbrRow][nbrCol] = min(roadmap[nbrRow][nbrCol], roadmap[row][col] + (int)(map[nbrRow][nbrCol] - '0'));
-            // #1. Find next minimum & unmarked point - Method 1:
-            // if (roadmap[nbrRow][nbrCol] < minPoint && marked[nbrRow][nbrCol] == false) {
-            //     minPoint = roadmap[nbrRow][nbrCol];
-            //     nextRow = nbrRow;
-            //     nextCol = nbrCol;
-            // }
 
-            // #2. Find next minimum & unmarked point - Method 2: --> Need discussion why need to scan full map instead of #1
             for (int ri = 0; ri < N; ++ri) {
                 for (int ci = 0; ci < N; ++ci) {
                     if (roadmap[ri][ci] < minPoint && marked[ri][ci] == false) {
@@ -83,13 +76,6 @@ int main()
     roadmap[0][0] = 0;
 
     ans = dijkstra(0, 0);
-
-    // // debug:
-    // for (int i = 0; i < N; ++i) {
-    //     for (int j = 0; j < N; ++j)
-    //         cout << roadmap[i][j] << " ";
-    // }
-    // cout << endl;
 
     cout << ans << endl;	//	Output answer
     return 0;

@@ -1,2 +1,16 @@
 .vscode
 .DS_Store
+
+*
+!*/
+!*/*.cpp
+
+!/*.cpp
+!/*/*.cpp
+!/*/*/*.cpp
+!/*/*/*/*.cpp
+
+/*.cph
+/*/*.cph
+/*/*/*.cph
+/*/*/*/*.cph
